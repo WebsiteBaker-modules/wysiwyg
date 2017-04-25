@@ -10,9 +10,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.x
  * @requirements    PHP 5.2.2 and higher
- * @version         $Id: RU.php 1386 2011-01-16 09:56:53Z Luisehahne $
- * @filesource        $HeadURL: http://svn.websitebaker2.org/branches/2.8.x/wb/admin/users/save.php $
- * @lastmodified    $Date: 2011-01-10 13:21:47 +0100 (Mo, 10. Jan 2011) $
+ * @version         $Id: RU.php 67 2017-03-03 22:14:28Z manu $
+ * @filesource        $HeadURL: svn://isteam.dynxs.de/wb2.10/tags/WB-2.10.0/wb/modules/wysiwyg/languages/RU.php $
+ * @lastmodified    $Date: 2017-03-03 23:14:28 +0100 (Fr, 03. Mrz 2017) $
  *
  */
 

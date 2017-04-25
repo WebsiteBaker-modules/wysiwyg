@@ -1,6 +1,6 @@
 <?php
 
-// $Id: NL.php 915 2009-01-21 19:27:01Z Ruebenwurzel $
+// $Id: NL.php 67 2017-03-03 22:14:28Z manu $
 
 /*
 

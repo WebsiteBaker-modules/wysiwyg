@@ -9,9 +9,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: modify.php 1581 2012-01-17 21:16:25Z darkviper $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb_svn/wb280/tags/2.8.3/wb/modules/wysiwyg/modify.php $
- * @lastmodified    $Date: 2012-01-17 22:16:25 +0100 (Di, 17. Jan 2012) $
+ * @version         $Id: modify.php 67 2017-03-03 22:14:28Z manu $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2.10/tags/WB-2.10.0/wb/modules/wysiwyg/modify.php $
+ * @lastmodified    $Date: 2017-03-03 23:14:28 +0100 (Fr, 03. Mrz 2017) $
  *
  */
 
