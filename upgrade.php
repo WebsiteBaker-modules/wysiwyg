@@ -9,61 +9,51 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: upgrade.php 67 2017-03-03 22:14:28Z manu $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2.10/tags/WB-2.10.0/wb/modules/wysiwyg/upgrade.php $
- * @lastmodified    $Date: 2017-03-03 23:14:28 +0100 (Fr, 03. Mrz 2017) $
+ * @version         $Id: upgrade.php 2 2017-07-02 15:14:29Z Manuela $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb/2.10.x/branches/main/modules/wysiwyg/upgrade.php $
+ * @lastmodified    $Date: 2017-07-02 17:14:29 +0200 (So, 02. Jul 2017) $
  *
  */
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
+if (!defined('SYSTEM_RUN')) { header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); flush(); exit; }
 /* -------------------------------------------------------- */
-$msg = '';
-$sTable = TABLE_PREFIX.'mod_wysiwyg';
-if(($sOldType = $database->getTableEngine($sTable))) {
-    if(('myisam' != strtolower($sOldType))) {
-        if(!$database->query('ALTER TABLE `'.$sTable.'` Engine = \'MyISAM\' ')) {
-            $msg = $database->get_error();
-        }
+    $globalStarted = preg_match('/upgrade\-script\.php$/', $_SERVER["SCRIPT_NAME"]);
+    $sWbVersion = ($globalStarted && defined('VERSION') ? VERSION : WB_VERSION);
+    if (version_compare($sWbVersion, '2.11.0', '<')){
+        throw new Exception ('It is not possible to install from WebsiteBaker Versions before 2.11.0');
     }
-} else {
-    $msg .= $database->get_error().'<br />';
-}
+    $msg = '';
+    $sInstallStruct = __DIR__.'/install-struct.sql';
+    if (!$database->SqlImport($sInstallStruct, TABLE_PREFIX, 'upgrade' )){
+        $msg = $database->get_error();
+    }
 // sanitize URLs inside mod_wysiwyg.content ----------------------------
     $msg = '';
-    $sRelUrl = preg_replace('/^https?:\/\/[^\/]+(.*)/is', '\1', WB_URL);
-    $sDocumentRootUrl = str_replace($sRelUrl, '', WB_URL);
-    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
     $sql = 'SELECT `content`, `section_id` FROM `'.TABLE_PREFIX.'mod_wysiwyg`';
     if (($oInstances = $database->query($sql))) {
         while (($aInstance = $oInstances->fetchRow(MYSQLI_ASSOC))) {
             // add $sDocumentRootUrl to relative URLs
-            $aPatterns = array(
-                '/(<[^>]*?=\s*\")(\/+)([^\"]*?\"[^>]*?)/is',
-                '/(<[^>]*=\s*")('.preg_quote($sMediaUrl, '/').')([^">]*".*>)/siU'
-            );
-            $aReplacements = array(
-                '\1'.$sDocumentRootUrl.'/\3',
-                '$1{SYSVAR:MEDIA_REL}$3'
-            );
-            $aInstance['content'] = preg_replace($aPatterns, $aReplacements, $aInstance['content']);
+            $sContent = $admin->ReplaceAbsoluteMediaUrl($aInstance['content']);
+            $sText = strip_tags($sContent);
             $sql = 'UPDATE `'.TABLE_PREFIX.'mod_wysiwyg` '
-                 . 'SET `content`=\''.$database->escapeString($aInstance['content']).'\' '
+                 . 'SET `content`=\''.$database->escapeString($sContent).'\', '
+                . '`text`=\''.$database->escapeString($sText).'\' '
                  . 'WHERE `section_id`='.(int)$aInstance['section_id'];
             if (!$database->query($sql)) {
                 $msg = $database->get_error();
                 break;
             }
-        }
+        }// end while
     } else { $msg = $database->get_error(); }
 
 // ---------------------------------------------------------------------
-
+/*
 $sql  = 'UPDATE `'.$sTable.'` SET '
       . '`content` = REPLACE(`content`, \'"'.WB_URL.MEDIA_DIRECTORY.'\', \'"{SYSVAR:MEDIA_REL}\')';
 if (!$database->query($sql)) {
     $msg .= $database->get_error().'<br />';
 }
-
+*/
 // ------------------------------------

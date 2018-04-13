@@ -23,4 +23,7 @@ CREATE TABLE IF NOT EXISTS `{TABLE_PREFIX}mod_wysiwyg` (
   `text` longtext{FIELD_COLLATION} NOT NULL,
   PRIMARY KEY (`section_id`)
 ){TABLE_ENGINE=MyISAM};
+ALTER TABLE `{TABLE_PREFIX}mod_wysiwyg` {FIELD_COLLATION};
+ALTER TABLE `{TABLE_PREFIX}mod_wysiwyg` CHANGE `content` `content` longtext {FIELD_COLLATION} NOT NULL;
+ALTER TABLE `{TABLE_PREFIX}mod_wysiwyg` CHANGE `text` `text` longtext {FIELD_COLLATION} NOT NULL;
 

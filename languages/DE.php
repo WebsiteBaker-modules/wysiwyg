@@ -1,6 +1,6 @@
 <?php
 
-// $Id: DE.php 67 2017-03-03 22:14:28Z manu $
+// $Id: DE.php 2 2017-07-02 15:14:29Z Manuela $
 
 /*
 
@@ -27,6 +27,6 @@
 */
 
 // Deutsche Modulbeschreibung
-$module_description = 'Dieses Modul erm&ouml;glicht die Bearbeitung von Seiteninhalten mit Hilfe eines grafischen Editors';
+$module_description = 'Dieses Modul ermöglicht die Bearbeitung von Seiteninhalten mit Hilfe eines grafischen Editors';
 
 ?>

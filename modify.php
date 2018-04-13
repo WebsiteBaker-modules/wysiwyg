@@ -1,43 +1,55 @@
 <?php
-/**
+/*
+ * Copyright (C) 2017 Manuela v.d.Decken <manuela@isteam.de>
  *
- * @category        modules
- * @package         wysiwyg
- * @author          WebsiteBaker Project
- * @copyright       WebsiteBaker Org. e.V.
- * @link            http://websitebaker.org/
- * @license         http://www.gnu.org/licenses/gpl.html
- * @platform        WebsiteBaker 2.8.3
- * @requirements    PHP 5.3.6 and higher
- * @version         $Id: modify.php 67 2017-03-03 22:14:28Z manu $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2.10/tags/WB-2.10.0/wb/modules/wysiwyg/modify.php $
- * @lastmodified    $Date: 2017-03-03 23:14:28 +0100 (Fr, 03. Mrz 2017) $
+ * DO NOT ALTER OR REMOVE COPYRIGHT OR THIS HEADER
  *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License 2 for more details.
+ *
+ * You should have received a copy of the GNU General Public License 2
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * Description of modules/wysiwyg/modify.php
+ *
+ * @package      Core
+ * @copyright    Manuela v.d.Decken <manuela@isteam.de>
+ * @author       Manuela v.d.Decken <manuela@isteam.de>
+ * @license      GNU General Public License 2.0
+ * @version      2.0.1
+ * @revision     $Id: modify.php 2 2017-07-02 15:14:29Z Manuela $
+ * @since        File available since 04.10.2017
+ * @deprecated   no
+ * @description  xxx
+ */
+//declare(strict_types = 1);
+//declare(encoding = 'UTF-8');
+
+//namespace ;
+
+// use
 
 /* -------------------------------------------------------- */
 // Must include code to stop this file being accessed directly
-if(defined('WB_PATH') == false) { die('Illegale file access /'.basename(__DIR__).'/'.basename(__FILE__).''); }
+if (!defined('SYSTEM_RUN')) { header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); flush(); exit; }
 /* -------------------------------------------------------- */
 
 // Get page content   htmlspecialchars
 $sql = 'SELECT `content` FROM `'.TABLE_PREFIX.'mod_wysiwyg` WHERE `section_id`='.(int)$section_id;
-if ( ($content = $database->get_one($sql)) ) {
-    $sFilterApi = WB_PATH.'/modules/output_filter/OutputFilterApi.php';
-    if (is_readable($sFilterApi)) {
-        require_once($sFilterApi);
-        $content = OutputFilterApi('ReplaceSysvar', $content);
-    }
+if (($content = $database->get_one($sql)) ) {
+    $content = OutputFilterApi('ReplaceSysvar', $content);
     $content = htmlspecialchars($content);
 } else {
     $content = '';
 }
-if(mb_detect_encoding($content, 'UTF-8, '.strtoupper(DEFAULT_CHARSET)) === 'UTF-8'){
-  # der String ist in UTF-8 kodiert
-//$content = (utf8_decode($content));
-//$content = (iconv("UTF-8", strtoupper(DEFAULT_CHARSET), $content));
-}
-//  $content = utf8_decode($content);
+
 if(!isset($wysiwyg_editor_loaded)) {
     $wysiwyg_editor_loaded=true;
     if (!defined('WYSIWYG_EDITOR') OR WYSIWYG_EDITOR=="none" OR !file_exists(WB_PATH.'/modules/'.WYSIWYG_EDITOR.'/include.php')) {
@@ -57,22 +69,27 @@ if(!isset($wysiwyg_editor_loaded)) {
         }
     }
 }
+$sSectionsTitle = (isset($section) ? $section['title'] : '');
+$SectionIdPrefix = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? ''.SEC_ANCHOR.(int)$section_id : (int)$section_id );
 ?>
-<form name="wysiwyg<?php echo $section_id; ?>" action="<?php echo WB_URL; ?>/modules/wysiwyg/save.php" method="post">
+<form id="wysiwyg<?php echo $section_id; ?>" action="<?php echo WB_URL; ?>/modules/wysiwyg/save.php" method="post">
     <input type="hidden" name="page_id" value="<?php echo $page_id; ?>" />
     <input type="hidden" name="section_id" value="<?php echo $section_id; ?>" />
+    <input type="hidden" name="inputSection" value="1" />
+    <?php echo $admin->getFTAN(); ?>
+    <div id="<?php echo $SectionIdPrefix; ?>" ></div>
+
 <?php
-echo $admin->getFTAN()."\n";
-show_wysiwyg_editor('content'.$section_id,'content'.$section_id,$content,'100%','350', false);
+echo show_wysiwyg_editor('content'.$section_id,'content'.$section_id,$content,'100%','250', false);
 ?>
-    <table  style="padding-bottom: 10px; width: 100%;">
+    <table style="padding-bottom: 10px; width: 100%;">
         <tr>
             <td style="text-align: left;margin-left: 1em;">
-                <input name="modify" type="submit" value="<?php echo $TEXT['SAVE']; ?>" style="min-width: 100px; margin-top: 5px;" />
-                <input name="pagetree" type="submit" value="<?php echo $TEXT['SAVE'].' &amp; '.$TEXT['BACK']; ?>" style="min-width: 100px; margin-top: 5px;" />
+                <input class="btn w3-blue-wb w3-hover-green" name="modify" type="submit" value="<?php echo $TEXT['SAVE']; ?>"  />
+                <input class="btn w3-blue-wb w3-hover-green" name="pagetree" type="submit" value="<?php echo $TEXT['SAVE'].' &amp; '.$TEXT['BACK']; ?>"  />
             </td>
             <td style="text-align: right;margin-right: 1em;">
-                <input name="cancel" type="button" value="<?php echo $TEXT['CANCEL']; ?>" onclick="window.location = 'index.php';" style="min-width: 100px; margin-top: 5px;" />
+                <input class="btn w3-blue-wb w3-hover-red" name="cancel" type="button" value="<?php echo $TEXT['CANCEL']; ?>" onclick="window.location = 'index.php';"  />
             </td>
         </tr>
     </table>

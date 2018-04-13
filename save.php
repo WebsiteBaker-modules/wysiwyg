@@ -9,9 +9,9 @@
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.3
  * @requirements    PHP 5.3.6 and higher
- * @version         $Id: save.php 67 2017-03-03 22:14:28Z manu $
- * @filesource      $HeadURL: svn://isteam.dynxs.de/wb2.10/tags/WB-2.10.0/wb/modules/wysiwyg/save.php $
- * @lastmodified    $Date: 2017-03-03 23:14:28 +0100 (Fr, 03. Mrz 2017) $
+ * @version         $Id: save.php 2 2017-07-02 15:14:29Z Manuela $
+ * @filesource      $HeadURL: svn://isteam.dynxs.de/wb/2.10.x/branches/main/modules/wysiwyg/save.php $
+ * @lastmodified    $Date: 2017-07-02 17:14:29 +0200 (So, 02. Jul 2017) $
  *
 */
 
@@ -32,34 +32,18 @@ if (!$admin->checkFTAN()) {
 $admin->print_header();
 
 // Include the WB functions file
-require_once(WB_PATH.'/framework/functions.php');
+if (!function_exists('make_dir')){require(WB_PATH.'/framework/functions.php');}
 
-$bBackLink = isset($_POST['pagetree']);
+$bBackLink = isset($aRequestVars['pagetree']);
+
 // Update the mod_wysiwygs table with the contents
-if(isset($_POST['content'.$section_id])) {
-    $content = $_POST['content'.$section_id];
+if(isset($aRequestVars['content'.$section_id])) {
+    $content = $aRequestVars['content'.$section_id];
     if(ini_get('magic_quotes_gpc')==true)
     {
-        $content = $admin->strip_slashes($_POST['content'.$section_id]);
+        $content = $admin->strip_slashes($aRequestVars['content'.$section_id]);
     }
-/*
-    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
-    $searchfor = '@(<[^>]*=\s*")('.preg_quote($sMediaUrl).')([^">]*".*>)@siU';
-    $content = preg_replace($searchfor, '$1{SYSVAR:MEDIA_REL}$3', $content);
-*/
-    $sRelUrl = preg_replace('/^https?:\/\/[^\/]+(.*)/is', '\1', WB_URL);
-    $sDocumentRootUrl = str_replace($sRelUrl, '', WB_URL);
-    $sMediaUrl = WB_URL.MEDIA_DIRECTORY;
-    $aPatterns = array(
-        '/(<[^>]*?=\s*\")(\/+)([^\"]*?\"[^>]*?)/is',
-        '/(<[^>]*=\s*")('.preg_quote($sMediaUrl, '/').')([^">]*".*>)/siU'
-    );
-    $aReplacements = array(
-        '\1'.$sDocumentRootUrl.'/\3',
-        '$1{SYSVAR:MEDIA_REL}$3'
-    );
-    $content = preg_replace($aPatterns, $aReplacements, $content);
-
+    $content = $admin->ReplaceAbsoluteMediaUrl($content);
     $text = strip_tags($content);
     $sql = 'UPDATE `'.TABLE_PREFIX.'mod_wysiwyg` SET '
          . '`content`=\''.$database->escapeString($content).'\', '
@@ -67,7 +51,7 @@ if(isset($_POST['content'.$section_id])) {
          . 'WHERE `section_id`='.(int)$section_id;
     $database->query($sql);
 }
-$sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR.$section['section_id'] : '' );
+$sec_anchor = (defined( 'SEC_ANCHOR' ) && ( SEC_ANCHOR != '' )  ? '#'.SEC_ANCHOR.(int)$section_id : '' );
 if(defined('EDIT_ONE_SECTION') && EDIT_ONE_SECTION){
     $edit_page = ADMIN_URL.'/pages/modify.php?page_id='.$page_id.'&wysiwyg='.$section_id;
 } elseif ( $bBackLink ) {
